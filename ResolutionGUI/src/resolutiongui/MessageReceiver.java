@@ -1,0 +1,104 @@
+package resolutiongui;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
+
+/**
+ * Thread that receives messages from Prolog
+ */
+public class MessageReceiver extends Thread {
+    ServerSocket serverSocket;
+    volatile Socket socket = null;
+    volatile PipedInputStream pipedInputStream = null;
+    PrologConnection connection;
+
+    public synchronized void setSocket(Socket _socket) {
+        socket = _socket;
+        notify();
+    }    
+    
+    public final synchronized void setPipedInputStream(PipedInputStream _pis) {
+        pipedInputStream = _pis;
+        notify();
+    }
+    
+    public synchronized Socket getSocket() throws InterruptedException {
+        if (socket == null) {
+            wait();
+        }
+        return socket;
+    }
+    
+    public synchronized PipedInputStream getPipedInputStream() throws InterruptedException {
+        if (pipedInputStream == null) {
+            wait();
+        }
+        return pipedInputStream;
+    }
+    
+    public MessageReceiver(PrologConnection _connection, ServerSocket _serverSocket) throws IOException {
+        serverSocket = _serverSocket;
+        connection = _connection;
+    }
+    
+    @Override
+    public void run() {
+        try {
+            Socket socketAux = serverSocket.accept();
+            setSocket(socketAux);
+            
+            InputStream inputStream = socketAux.getInputStream();
+            
+            PipedOutputStream pos = new PipedOutputStream();
+            setPipedInputStream(new PipedInputStream(pos));
+            
+            int chr;
+            String str = "";
+            String currentTestName = "";
+            while ((chr = inputStream.read()) != -1) {
+                pos.write(chr);
+                str += (char) chr;
+                if (chr == '\n') {
+                    final String lineToWrite = str;
+                    
+                    // Detect test name from "Running: test_xxx" line
+                    if (lineToWrite.startsWith("Running: ")) {
+                        currentTestName = lineToWrite.substring(9).trim();
+                    }
+                    
+                    // Detect result and update result label
+                    if (lineToWrite.contains("Result: ")) {
+                        final String testName = currentTestName;
+                        final String result = lineToWrite.substring(lineToWrite.indexOf("Result: ") + 8).trim();
+                        final String subject = connection.getMainWindow().getCurrentSubject();
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (subject.equals("s1")) {
+                                    connection.getMainWindow().updateS1ResultLabel(testName, result);
+                                } else {
+                                    connection.getMainWindow().updateS2ResultLabel(testName, result);
+                                }
+                            }
+                        });
+                    }
+                    
+                    str = "";
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() { 
+                            connection.getMainWindow().getOutputTextArea().append(lineToWrite); 
+                        }
+                    });
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(MessageReceiver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}

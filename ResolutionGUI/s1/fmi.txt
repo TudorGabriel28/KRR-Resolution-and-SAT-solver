@@ -1,0 +1,6 @@
+[neg(studentAt(X1, fmi)), smart(X1)].
+[neg(inCourse(X2, ai)), studentAt(X2, fmi)].
+[neg(smart(X3)), neg(studiesHard(X3)), passes(X3, krr)].
+[inCourse(ana, ai)].
+[studiesHard(ana)].
+[neg(passes(ana, krr))].

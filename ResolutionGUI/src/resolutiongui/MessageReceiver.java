@@ -8,9 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
-/**
- * Thread that receives messages from Prolog
- */
 public class MessageReceiver extends Thread {
     ServerSocket serverSocket;
     volatile Socket socket = null;
@@ -49,12 +46,10 @@ public class MessageReceiver extends Thread {
                 if (chr == '\n') {
                     final String lineToWrite = str;
                     
-                    // Detect test name from "Running: test_xxx" line
                     if (lineToWrite.startsWith("Running: ")) {
                         currentTestName = lineToWrite.substring(9).trim();
                     }
                     
-                    // Detect result and update result label
                     if (lineToWrite.contains("Result: ")) {
                         final String testName = currentTestName;
                         final String result = lineToWrite.substring(lineToWrite.indexOf("Result: ") + 8).trim();
@@ -79,7 +74,7 @@ public class MessageReceiver extends Thread {
                 }
             }
         } catch (IOException ex) {
-            Logger.getLogger(MessageReceiver.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex.getMessage());
         }
     }
 }

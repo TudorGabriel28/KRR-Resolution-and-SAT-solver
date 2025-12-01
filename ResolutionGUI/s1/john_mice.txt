@@ -1,0 +1,8 @@
+[neg(hound(X1)), howl(X1)].
+[neg(have(X2,Y2)), neg(cat(Y2)), neg(have(X2,Z2)), neg(mouse(Z2))].
+[neg(ls(X3)), neg(have(X3,Y3)), neg(howl(Y3))].
+[have(john, sk1)].
+[cat(sk1), hound(sk1)].
+[ls(john)].
+[have(john, sk2)].
+[mouse(sk2)].

@@ -9,9 +9,6 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Thread that sends messages to Prolog
- */
 public class MessageSender extends Thread {
     Socket socket;
     MessageReceiver receiver;
@@ -53,10 +50,8 @@ public class MessageSender extends Thread {
             while ((chr = pipedInputStream.read()) != -1) {
                 outputStream.write(chr);
             }
-        } catch (IOException ex) {
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MessageSender.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
         }
     }
 }

@@ -1,0 +1,3 @@
+[plus(zero, X1, X1)].
+[neg(plus(X2, Y2, Z2)), plus(succ(X2), Y2, succ(Z2))].
+[neg(plus(succ(succ(zero)), succ(succ(succ(zero))), _U))].

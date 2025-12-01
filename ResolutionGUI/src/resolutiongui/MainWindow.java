@@ -7,18 +7,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 
-/**
- * Main GUI Window for Resolution Test Cases and Davis-Putnam SAT Solver
- */
 public class MainWindow extends JFrame {
     
     PrologConnection connection;
-    String currentSubject = "s1"; // Default to subject 1
+    String currentSubject = "s1"; 
     
-    // GUI Components
     private JTabbedPane tabbedPane;
     
-    // Subject 1 (Resolution) components
     private JPanel s1Panel;
     private JComboBox<String> s1TestCaseComboBox;
     private JButton s1RunTestButton;
@@ -30,7 +25,6 @@ public class MainWindow extends JFrame {
     private JLabel s1LastResultLabel;
     private JLabel s1OutputLabel;
     
-    // Subject 2 (Davis-Putnam) components
     private JPanel s2Panel;
     private JComboBox<String> s2TestCaseComboBox;
     private JComboBox<String> s2StrategyComboBox;
@@ -74,13 +68,11 @@ public class MainWindow extends JFrame {
         s1Panel = new JPanel();
         s1Panel.setLayout(null);
         
-        // Title Label
         s1TitleLabel = new JLabel("Select a Test Case to Run:");
         s1TitleLabel.setBounds(20, 10, 400, 25);
         s1TitleLabel.setFont(new Font("Arial", Font.BOLD, 14));
         s1Panel.add(s1TitleLabel);
         
-        // Test Case ComboBox
         s1TestCaseComboBox = new JComboBox<>(new String[] {
             "test_fmi - FOL Test (Student/Course)",
             "test_blocks - FOL Test (Blocks World)",
@@ -95,7 +87,6 @@ public class MainWindow extends JFrame {
         s1TestCaseComboBox.setFont(new Font("Arial", Font.PLAIN, 12));
         s1Panel.add(s1TestCaseComboBox);
         
-        // Run Test Button
         s1RunTestButton = new JButton("Run Test");
         s1RunTestButton.setBounds(380, 45, 120, 30);
         s1RunTestButton.setFont(new Font("Arial", Font.BOLD, 12));
@@ -106,7 +97,6 @@ public class MainWindow extends JFrame {
         });
         s1Panel.add(s1RunTestButton);
         
-        // Clear Output Button
         s1ClearOutputButton = new JButton("Clear Output");
         s1ClearOutputButton.setBounds(520, 45, 130, 30);
         s1ClearOutputButton.setFont(new Font("Arial", Font.BOLD, 12));
@@ -117,7 +107,6 @@ public class MainWindow extends JFrame {
         });
         s1Panel.add(s1ClearOutputButton);
         
-        // Last Test Result Section
         s1ResultsLabel = new JLabel("Last Test Result:");
         s1ResultsLabel.setBounds(20, 90, 200, 25);
         s1ResultsLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -134,13 +123,11 @@ public class MainWindow extends JFrame {
         s1LastResultLabel.setBackground(java.awt.Color.WHITE);
         s1Panel.add(s1LastResultLabel);
         
-        // Output Label
         s1OutputLabel = new JLabel("Output from Prolog:");
         s1OutputLabel.setBounds(20, 185, 400, 25);
         s1OutputLabel.setFont(new Font("Arial", Font.BOLD, 14));
         s1Panel.add(s1OutputLabel);
         
-        // Output Text Area
         s1OutputTextArea = new JTextArea();
         s1OutputTextArea.setEditable(false);
         s1OutputTextArea.setFont(new Font("Courier New", Font.PLAIN, 12));
@@ -157,13 +144,11 @@ public class MainWindow extends JFrame {
         s2Panel = new JPanel();
         s2Panel.setLayout(null);
         
-        // Title Label
         s2TitleLabel = new JLabel("Select Test and Strategy:");
         s2TitleLabel.setBounds(20, 10, 400, 25);
         s2TitleLabel.setFont(new Font("Arial", Font.BOLD, 14));
         s2Panel.add(s2TitleLabel);
         
-        // Test Case ComboBox
         s2TestCaseComboBox = new JComboBox<>(new String[] {
             "test1", "test2", "test3", "test4", "test5", "test6"
         });
@@ -171,13 +156,11 @@ public class MainWindow extends JFrame {
         s2TestCaseComboBox.setFont(new Font("Arial", Font.PLAIN, 12));
         s2Panel.add(s2TestCaseComboBox);
         
-        // Strategy Label
         s2StrategyLabel = new JLabel("Strategy:");
         s2StrategyLabel.setBounds(190, 50, 80, 25);
         s2StrategyLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         s2Panel.add(s2StrategyLabel);
         
-        // Strategy ComboBox
         s2StrategyComboBox = new JComboBox<>(new String[] {
             "most_frequent", "shortest_clause"
         });
@@ -185,7 +168,6 @@ public class MainWindow extends JFrame {
         s2StrategyComboBox.setFont(new Font("Arial", Font.PLAIN, 12));
         s2Panel.add(s2StrategyComboBox);
         
-        // Run Test Button
         s2RunTestButton = new JButton("Run Test");
         s2RunTestButton.setBounds(425, 45, 100, 30);
         s2RunTestButton.setFont(new Font("Arial", Font.BOLD, 12));
@@ -196,7 +178,6 @@ public class MainWindow extends JFrame {
         });
         s2Panel.add(s2RunTestButton);
         
-        // Clear Output Button
         s2ClearOutputButton = new JButton("Clear Output");
         s2ClearOutputButton.setBounds(540, 45, 110, 30);
         s2ClearOutputButton.setFont(new Font("Arial", Font.BOLD, 12));
@@ -207,7 +188,6 @@ public class MainWindow extends JFrame {
         });
         s2Panel.add(s2ClearOutputButton);
         
-        // Last Test Result Section
         s2ResultsLabel = new JLabel("Last Test Result:");
         s2ResultsLabel.setBounds(20, 90, 200, 25);
         s2ResultsLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -224,13 +204,11 @@ public class MainWindow extends JFrame {
         s2LastResultLabel.setBackground(java.awt.Color.WHITE);
         s2Panel.add(s2LastResultLabel);
         
-        // Output Label
         s2OutputLabel = new JLabel("Output from Prolog:");
         s2OutputLabel.setBounds(20, 185, 400, 25);
         s2OutputLabel.setFont(new Font("Arial", Font.BOLD, 14));
         s2Panel.add(s2OutputLabel);
         
-        // Output Text Area
         s2OutputTextArea = new JTextArea();
         s2OutputTextArea.setEditable(false);
         s2OutputTextArea.setFont(new Font("Courier New", Font.PLAIN, 12));
@@ -245,9 +223,8 @@ public class MainWindow extends JFrame {
     
     private void s1RunTestButtonActionPerformed(ActionEvent evt) {
         String selectedItem = (String) s1TestCaseComboBox.getSelectedItem();
-        String testName = selectedItem.split(" - ")[0]; // Extract test name
+        String testName = selectedItem.split(" - ")[0]; 
         
-        // Update result label to show test is running
         s1LastResultLabel.setText("Running: " + testName + "...");
         s1LastResultLabel.setBackground(java.awt.Color.LIGHT_GRAY);
         
@@ -257,10 +234,8 @@ public class MainWindow extends JFrame {
         
         try {
             connection.sender.sendMessageToProlog(testName);
-        } catch (Exception ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-            s1OutputTextArea.append("ERROR: Failed to send command to Prolog\n");
-            updateS1ResultLabel(testName, "ERROR");
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
     
@@ -273,7 +248,6 @@ public class MainWindow extends JFrame {
         String testName = (String) s2TestCaseComboBox.getSelectedItem();
         String strategy = (String) s2StrategyComboBox.getSelectedItem();
         
-        // Update result label to show test is running
         s2LastResultLabel.setText("Running: " + testName + " with " + strategy + "...");
         s2LastResultLabel.setBackground(java.awt.Color.LIGHT_GRAY);
         
@@ -283,14 +257,10 @@ public class MainWindow extends JFrame {
         s2StartTime = System.currentTimeMillis();
 
         try {
-            // Send command in format: solve(test1, most_frequent)
-            // Send command in format: solve(test1, most_frequent)
             String command = "solve(" + testName + ", " + strategy + ")";
             connection.sender.sendMessageToProlog(command);
-        } catch (Exception ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-            s2OutputTextArea.append("ERROR: Failed to send command to Prolog\n");
-            updateS2ResultLabel(testName + " (" + strategy + ")", "ERROR");
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
     
@@ -300,62 +270,41 @@ public class MainWindow extends JFrame {
     }
     
     public void updateS1ResultLabel(String testName, String result) {
-        String displayText = testName + " → " + result;
-        s1LastResultLabel.setText(displayText);
-        
-        // Color code based on result
-        if (result.contains("UNSATISFIABLE") || result.contains("Contradiction")) {
-            s1LastResultLabel.setBackground(new java.awt.Color(255, 200, 200)); // Light red
-        } else if (result.contains("SATISFIABLE")) {
-            s1LastResultLabel.setBackground(new java.awt.Color(200, 255, 200)); // Light green
-        } else if (result.contains("ERROR")) {
-            s1LastResultLabel.setBackground(new java.awt.Color(255, 220, 150)); // Light orange
+        s1LastResultLabel.setText("Result: " + result);
+        if (result.contains("UNSATISFIABLE") || result.contains("YES")) {
+            s1LastResultLabel.setBackground(new java.awt.Color(144, 238, 144)); 
+        } else if (result.contains("SATISFIABLE") || result.contains("NO")) {
+            s1LastResultLabel.setBackground(new java.awt.Color(255, 182, 193)); 
         } else {
             s1LastResultLabel.setBackground(java.awt.Color.WHITE);
         }
     }
-    
+
     public void updateS2ResultLabel(String testName, String result) {
-        long duration = System.currentTimeMillis() - s2StartTime;
-        String displayText = testName + " → " + result + " (" + duration + " ms)";
-        s2LastResultLabel.setText(displayText);
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - s2StartTime;
         
-        // Color code based on result
-        if (result.contains("NO") || result.contains("UNSATISFIABLE")) {
-            s2LastResultLabel.setBackground(new java.awt.Color(255, 200, 200)); // Light red
-        } else if (result.contains("YES") || result.contains("SATISFIABLE")) {
-            s2LastResultLabel.setBackground(new java.awt.Color(200, 255, 200)); // Light green
-        } else if (result.contains("ERROR")) {
-            s2LastResultLabel.setBackground(new java.awt.Color(255, 220, 150)); // Light orange
+        s2LastResultLabel.setText("Result: " + result + " | Time: " + duration + "ms");
+        if (result.contains("SATISFIABLE") || result.contains("YES")) {
+            s2LastResultLabel.setBackground(new java.awt.Color(144, 238, 144)); 
         } else {
-            s2LastResultLabel.setBackground(java.awt.Color.WHITE);
+            s2LastResultLabel.setBackground(new java.awt.Color(255, 182, 193)); 
         }
     }
     
     public JTextArea getOutputTextArea() {
-        // Return the appropriate text area based on current subject
-        return currentSubject.equals("s1") ? s1OutputTextArea : s2OutputTextArea;
+        if (currentSubject.equals("s1")) {
+            return s1OutputTextArea;
+        } else {
+            return s2OutputTextArea;
+        }
+    }
+    
+    public void setConnection(PrologConnection conn) {
+        this.connection = conn;
     }
     
     public String getCurrentSubject() {
         return currentSubject;
-    }
-    
-    public void setConnection(PrologConnection _connection) {
-        connection = _connection;
-    }
-    
-    public static void main(String args[]) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainWindow("KRR Test Cases", "s1").setVisible(true);
-            }
-        });
     }
 }

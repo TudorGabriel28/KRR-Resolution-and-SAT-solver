@@ -1,0 +1,5 @@
+[on(a,b)].
+[on(b,c)].
+[green(a)].
+[neg(green(c))].
+[neg(green(X)), green(Y), neg(on(X,Y))].

@@ -6,9 +6,6 @@ import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 
-/**
- * Manages connection to SWI-Prolog process
- */
 public class PrologConnection {
     final String swiPrologPath = "C:\\Program Files\\swipl\\bin\\swipl-win.exe";
     String prologFile;
@@ -29,7 +26,6 @@ public class PrologConnection {
         port = _port;
         mainWindow = _mainWindow;
         
-        // Set file and directory based on subject
         if (subject.equals("s1")) {
             prologFile = "test_cases.pl";
             workingDir = "s1";
@@ -49,7 +45,6 @@ public class PrologConnection {
         
         Runtime runtime = Runtime.getRuntime();
         
-        // Use array form to properly pass arguments to SWI-Prolog
         String[] command = {
             swiPrologPath,
             "-s", prologFile,
@@ -57,7 +52,6 @@ public class PrologConnection {
             String.valueOf(port)
         };
         
-        // Set working directory to subject folder
         java.io.File dir = new java.io.File(workingDir);
         prologProcess = runtime.exec(command, null, dir);
         

@@ -1,28 +1,22 @@
 :- consult('resolution.pl').
 
-% Socket communication setup
 :- use_module(library(socket)).
 
-% Store the socket streams
 :- dynamic input_stream/1.
 :- dynamic output_stream/1.
 
-% Initialize socket connection
 init_socket(Port) :-
     tcp_socket(Socket),
     tcp_connect(Socket, localhost:Port),
     tcp_open_socket(Socket, InStream, OutStream),
     assertz(input_stream(InStream)),
     assertz(output_stream(OutStream)),
-    % Start processing commands from Java
     process_commands(InStream, OutStream).
 
-% Process commands in a loop
 process_commands(InStream, OutStream) :-
     read(InStream, Command),
     process_command(InStream, OutStream, Command).
 
-% Handle exit command
 process_command(_, OutStream, exit) :- !,
     format('Exiting...~n'),
     close(OutStream),
@@ -33,27 +27,20 @@ process_command(_, OutStream, halt) :- !,
     close(OutStream),
     halt.
 
-% Handle test commands
 process_command(InStream, OutStream, TestName) :-
     atom(TestName),
     current_predicate(TestName/0),
     !,
     format(OutStream, 'Executing ~w...~n', [TestName]),
     flush_output(OutStream),
-    catch(
-        call(TestName),
-        Error,
-        (format(OutStream, 'ERROR: ~w~n', [Error]), flush_output(OutStream))
-    ),
+    call(TestName),
     process_commands(InStream, OutStream).
 
-% Handle unknown commands
 process_command(InStream, OutStream, Unknown) :-
     format(OutStream, 'Unknown command: ~w~n', [Unknown]),
     flush_output(OutStream),
     process_commands(InStream, OutStream).
 
-% Send message to GUI
 send_to_gui(Message) :-
     output_stream(Stream),
     !,
@@ -62,8 +49,6 @@ send_to_gui(Message) :-
 
 send_to_gui(Message) :-
     format('~w~n', [Message]).
-
-% Modified test predicates that send output to GUI
 
 test_fmi :-
     send_to_gui('Starting test_fmi (FOL - Student/Course)...'),
@@ -135,9 +120,6 @@ test_john_mice :-
     ),
     send_to_gui('test_john_mice completed.').
 
-
-% --- Part 1(d) Test Cases (Propositional) ---
-
 prove_prop_from_file(File) :-
     send_to_gui('Reading clauses from file...'),
     read_clauses_from_file(File, Clauses),
@@ -169,7 +151,6 @@ test_prop4 :-
     prove_prop_from_file('prop4.txt'),
     send_to_gui('test_prop4 completed.').
 
-% Main initialization when started from Java
 :- initialization(main).
 
 main :-

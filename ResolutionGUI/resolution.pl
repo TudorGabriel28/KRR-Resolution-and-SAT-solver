@@ -10,10 +10,6 @@
 negate(neg(X), X) :- !.
 negate(X, neg(X)).
 
-%
-% --- Part 1(c): FOL Resolution Engine ---
-%
-
 prove_fol(Clauses) :-
     fol_loop(Clauses).
 
@@ -46,10 +42,6 @@ resolve_pair_fol(C1_in, C2_in, Resolvent) :-
     unify_with_occurs_check(L2, NegL1),
     append(RestC1, RestC2, Combined),
     sort(Combined, Resolvent).
-
-%
-% --- Part 1(d): Propositional Resolution Engine (with Optimizations) ---
-%
 
 prove_prop(Clauses) :-
     maplist(sort, Clauses, SortedClauses),
@@ -121,11 +113,6 @@ sub_filter_helper([C|Rest], Acc, Out) :-
     exclude(subsumes(C), Rest, PrunedRest),
     exclude(subsumes(C), Acc, PrunedAcc),
     sub_filter_helper(PrunedRest, [C|PrunedAcc], Out).
-
-
-%
-% --- Part 1(d): File Reading Utility ---
-%
 
 read_clauses_from_file(File, Clauses) :-
     setup_call_cleanup(

@@ -10,16 +10,11 @@
 negate(neg(X), X) :- !.
 negate(X, neg(X)).
 
-%
-% --- Part 1(c): FOL Resolution Engine ---
-%
-
 prove_fol(Clauses) :-
     fol_loop(Clauses).
 
 fol_loop(Clauses) :-
     member([], Clauses), !,
-    write('Proof found (UNSATISFIABLE).'), nl,
     true.
 fol_loop(Clauses) :-
     findall(R, (
@@ -31,7 +26,6 @@ fol_loop(Clauses) :-
     subtract(NewResolvents, Clauses, TrulyNew),
     (
         TrulyNew = [], !,
-        write('No new clauses derived (SATISFIABLE).'), nl,
         false
     ;
         append(TrulyNew, Clauses, NextClauses),
@@ -47,10 +41,6 @@ resolve_pair_fol(C1_in, C2_in, Resolvent) :-
     append(RestC1, RestC2, Combined),
     sort(Combined, Resolvent).
 
-%
-% --- Part 1(d): Propositional Resolution Engine (with Optimizations) ---
-%
-
 prove_prop(Clauses) :-
     maplist(sort, Clauses, SortedClauses),
     list_to_set(SortedClauses, UniqueClauses),
@@ -59,7 +49,6 @@ prove_prop(Clauses) :-
 
 prop_loop(Clauses) :-
     member([], Clauses), !,
-    write('Proof found (UNSATISFIABLE).'), nl,
     true.
 prop_loop(Clauses) :-
     findall(R, (
@@ -74,7 +63,6 @@ prop_loop(Clauses) :-
     filter_subsumed(NewResolvents, Clauses, TrulyNew),
     (
         TrulyNew = [], !,
-        write('No new clauses derived (SATISFIABLE).'), nl,
         false
     ;
         append(TrulyNew, Clauses, TempNextClauses),
@@ -121,11 +109,6 @@ sub_filter_helper([C|Rest], Acc, Out) :-
     exclude(subsumes(C), Rest, PrunedRest),
     exclude(subsumes(C), Acc, PrunedAcc),
     sub_filter_helper(PrunedRest, [C|PrunedAcc], Out).
-
-
-%
-% --- Part 1(d): File Reading Utility ---
-%
 
 read_clauses_from_file(File, Clauses) :-
     setup_call_cleanup(

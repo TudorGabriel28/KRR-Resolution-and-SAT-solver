@@ -33,21 +33,11 @@ public class ResolutionGUI {
         
         try {            
             final MainWindow mainWindow = new MainWindow("KRR Test Cases - " + 
-                (subject.equals("s1") ? "Resolution" : "Davis-Putnam SAT"));
+                (subject.equals("s1") ? "Resolution" : "Davis-Putnam SAT"), subject);
             
             prologConn = new PrologConnection(PORT, mainWindow, subject);
             mainWindow.setConnection(prologConn);
             mainWindow.setVisible(true);
-            
-            // Set the appropriate tab
-            if (subject.equals("s2")) {
-                javax.swing.SwingUtilities.invokeLater(() -> {
-                    mainWindow.getContentPane().getComponent(0);
-                    if (mainWindow.getContentPane().getComponent(0) instanceof JTabbedPane) {
-                        ((JTabbedPane) mainWindow.getContentPane().getComponent(0)).setSelectedIndex(1);
-                    }
-                });
-            }
             
             mainWindow.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {

@@ -45,8 +45,9 @@ public class MainWindow extends JFrame {
     private JLabel s2OutputLabel;
     private long s2StartTime;
     
-    public MainWindow(String title) {
+    public MainWindow(String title, String subject) {
         super(title);
+        this.currentSubject = subject;
         initComponents();
     }
     
@@ -54,25 +55,15 @@ public class MainWindow extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLayout(null);
         
-        // Create tabbed pane
-        tabbedPane = new JTabbedPane();
-        tabbedPane.setBounds(10, 10, 700, 550);
-        
-        // Initialize both panels
-        initS1Panel();
-        initS2Panel();
-        
-        // Add tabs
-        tabbedPane.addTab("Subject 1: Resolution", s1Panel);
-        tabbedPane.addTab("Subject 2: Davis-Putnam SAT", s2Panel);
-        
-        // Add listener to track which tab is active
-        tabbedPane.addChangeListener(e -> {
-            int selectedIndex = tabbedPane.getSelectedIndex();
-            currentSubject = (selectedIndex == 0) ? "s1" : "s2";
-        });
-        
-        add(tabbedPane);
+        if (currentSubject.equals("s1")) {
+            initS1Panel();
+            s1Panel.setBounds(10, 10, 700, 550);
+            add(s1Panel);
+        } else {
+            initS2Panel();
+            s2Panel.setBounds(10, 10, 700, 550);
+            add(s2Panel);
+        }
         
         setSize(730, 600);
         setLocationRelativeTo(null);
@@ -363,7 +354,7 @@ public class MainWindow extends JFrame {
         
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainWindow("KRR Test Cases").setVisible(true);
+                new MainWindow("KRR Test Cases", "s1").setVisible(true);
             }
         });
     }

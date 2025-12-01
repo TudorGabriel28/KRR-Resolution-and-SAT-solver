@@ -1,7 +1,7 @@
-dan_fmi
--dan_fmi dan_student
--dan_student has_id
--dan_fmi attends_krr
--attends_krr -has_id studies_logic
--studies_logic will_pass
-will_pass
+toddler 
+-toddler child 
+-child -male boy 
+-infant child 
+-child -female girl 
+female 
+girl

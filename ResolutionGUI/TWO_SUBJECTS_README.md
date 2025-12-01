@@ -58,7 +58,7 @@ The main window now has two tabs:
 
 - Dropdown 1: Test selection (test1 - test6)
 - Dropdown 2: Strategy selection
-  - `first_atom` - Select first atom from first clause
+  - `most_frequent` - Select most frequent atom
   - `shortest_clause` - Select atom from shortest clause
 - Button: "Run Test"
 - Button: "Clear Output"
@@ -88,17 +88,17 @@ Same as before:
 
 ### Atom Selection Strategies
 
-- **first_atom**: Selects the first literal from the first clause
+- **most_frequent**: Selects the atom that appears most frequently in the clauses
 - **shortest_clause**: Selects a literal from the shortest clause (heuristic)
 
 ### Command Format
 
-The GUI sends commands like: `solve(test1, first_atom)`
+The GUI sends commands like: `solve(test1, most_frequent)`
 
 ### Example Output
 
 ```
-Running Davis-Putnam on test1.txt with strategy: first_atom
+Running Davis-Putnam on test1.txt with strategy: most_frequent
 Reading clauses from test1.txt...
 Clauses loaded. Running Davis-Putnam algorithm...
 Result: YES (SATISFIABLE)
@@ -157,7 +157,7 @@ The application asks on startup which subject to load. You can only run one subj
 
 You can compare how different strategies perform:
 
-1. Run test1 with `first_atom` strategy
+1. Run test1 with `most_frequent` strategy
 2. Click "Clear Output" (optional)
 3. Run test1 with `shortest_clause` strategy
 4. Compare the results and execution traces

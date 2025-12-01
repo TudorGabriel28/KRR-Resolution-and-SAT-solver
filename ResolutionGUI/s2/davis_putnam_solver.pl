@@ -1,15 +1,11 @@
 :- use_module(library(lists)).
 
-% --- Main entry point ---
-
 solve_file(File, Strategy) :-
     read_file_to_clauses(File, Clauses),
     ( dp(Clauses, Strategy, Assignment) ->
         format_solution(Assignment)
     ; write('NO.'), nl
     ).
-
-% --- Core DP Algorithm (Brachman & Levesque) ---
 
 dp([], _, []).
 
@@ -27,8 +23,6 @@ dp(Clauses, Strategy, [false(Atom)|Assignment]) :-
     simplify(Clauses, NotAtom, SimplifiedClauses),
     dp(SimplifiedClauses, Strategy, Assignment).
 
-% --- C•m (Simplify) Operation ---
-
 simplify([], _, []).
 
 simplify([Clause|Rest], Lit, NewClauses) :-
@@ -43,16 +37,30 @@ simplify([Clause|Rest], Lit, [NewClause|NewClauses]) :-
 simplify([Clause|Rest], Lit, [Clause|NewClauses]) :-
     simplify(Rest, Lit, NewClauses).
 
-% --- Atom Selection Strategies ---
-
-select_atom(first_atom, Clauses, Atom) :-
-    Clauses = [[Lit|_]|_],
-    get_atom(Lit, Atom).
+select_atom(most_frequent, Clauses, BestAtom) :-
+    findall(A, (member(C, Clauses), member(L, C), get_atom(L, A)), AllAtoms),
+    sort(AllAtoms, UniqueAtoms),
+    map_counts(UniqueAtoms, AllAtoms, Counts),
+    sort(Counts, SortedCounts),
+    last(SortedCounts, _-BestAtom).
 
 select_atom(shortest_clause, Clauses, Atom) :-
     find_shortest_clause(Clauses, ShortestClause),
     member(Lit, ShortestClause),
     get_atom(Lit, Atom), !.
+
+map_counts([], _, []).
+map_counts([A|Rest], All, [Count-A|Counts]) :-
+    count_occurrences(A, All, Count),
+    map_counts(Rest, All, Counts).
+
+count_occurrences(_, [], 0).
+count_occurrences(X, [X|T], N) :-
+    count_occurrences(X, T, N1),
+    N is N1 + 1.
+count_occurrences(X, [Y|T], N) :-
+    X \= Y,
+    count_occurrences(X, T, N).
 
 find_shortest_clause(Clauses, Shortest) :-
     predsort(compare_length, Clauses, [Shortest|_]).
@@ -62,14 +70,17 @@ compare_length(R, L1, L2) :-
     length(L2, Len2),
     compare(R, Len1, Len2).
 
-% --- File Parsing ---
+get_atom(not(P), P).
+get_atom(P, P) :- \+ P = not(_).
+
+get_complement(not(P), P).
+get_complement(P, not(P)) :- \+ P = not(_).
 
 read_file_to_clauses(File, Clauses) :-
     open(File, read, Stream),
     read_lines(Stream, Lines),
     close(Stream),
     parse_lines(Lines, Clauses).
-
 
 read_lines(Stream, []) :-
     at_end_of_stream(Stream), !.
@@ -79,7 +90,7 @@ read_lines(Stream, Lines) :-
     ( Line == end_of_file ->
         Lines = []
     ; Line = "" ->
-        read_lines(Stream, Lines)         % skip blank line
+        read_lines(Stream, Lines)
     ;
         Lines = [Line|Rest],
         read_lines(Stream, Rest)
@@ -87,8 +98,11 @@ read_lines(Stream, Lines) :-
 
 parse_lines([], []).
 parse_lines([Line|Rest], [Clause|Clauses]) :-
-    split_string(Line, " ", "", Words),
+    split_string(Line, " ", "\s\t\n", Words),
+    Words \= [],
     parse_words(Words, Clause),
+    parse_lines(Rest, Clauses).
+parse_lines([_|Rest], Clauses) :-
     parse_lines(Rest, Clauses).
 
 parse_words([], []).
@@ -101,8 +115,6 @@ parse_words([Word|Rest], [Lit|Lits]) :-
         Lit = Atom
     ),
     parse_words(Rest, Lits).
-
-% --- Output Formatting ---
 
 format_solution(Assignment) :-
     write('YES.'), nl,
@@ -121,11 +133,3 @@ print_assignment([true(Atom)|Rest]) :-
 print_assignment([false(Atom)|Rest]) :-
     format('~w/false; ', [Atom]),
     print_assignment(Rest).
-
-% --- Utility Predicates ---
-
-get_atom(not(P), P).
-get_atom(P, P) :- \+ P = not(_).
-
-get_complement(not(P), P).
-get_complement(P, not(P)) :- \+ P = not(_).

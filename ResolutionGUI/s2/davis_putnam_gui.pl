@@ -31,7 +31,7 @@ process_command(_, OutStream, halt) :- !,
     close(OutStream),
     halt.
 
-% Handle solve command: solve(test1, first_atom) or solve(test1, shortest_clause)
+% Handle solve command: solve(test1, most_frequent) or solve(test1, shortest_clause)
 process_command(InStream, OutStream, solve(TestName, Strategy)) :-
     atom(TestName),
     atom(Strategy),

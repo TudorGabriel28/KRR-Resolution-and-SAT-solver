@@ -187,7 +187,7 @@ public class MainWindow extends JFrame {
         
         // Strategy ComboBox
         s2StrategyComboBox = new JComboBox<>(new String[] {
-            "first_atom", "shortest_clause"
+            "most_frequent", "shortest_clause"
         });
         s2StrategyComboBox.setBounds(255, 45, 150, 30);
         s2StrategyComboBox.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -290,7 +290,7 @@ public class MainWindow extends JFrame {
         s2OutputTextArea.append("========================================\n");
         
         try {
-            // Send command in format: solve(test1, first_atom)
+            // Send command in format: solve(test1, most_frequent)
             String command = "solve(" + testName + ", " + strategy + ")";
             connection.sender.sendMessageToProlog(command);
         } catch (Exception ex) {

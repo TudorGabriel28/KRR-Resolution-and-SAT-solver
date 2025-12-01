@@ -2,8 +2,6 @@ package resolutiongui;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -16,7 +14,6 @@ import javax.swing.SwingUtilities;
 public class MessageReceiver extends Thread {
     ServerSocket serverSocket;
     volatile Socket socket = null;
-    volatile PipedInputStream pipedInputStream = null;
     PrologConnection connection;
 
     public synchronized void setSocket(Socket _socket) {
@@ -24,23 +21,11 @@ public class MessageReceiver extends Thread {
         notify();
     }    
     
-    public final synchronized void setPipedInputStream(PipedInputStream _pis) {
-        pipedInputStream = _pis;
-        notify();
-    }
-    
     public synchronized Socket getSocket() throws InterruptedException {
         if (socket == null) {
             wait();
         }
         return socket;
-    }
-    
-    public synchronized PipedInputStream getPipedInputStream() throws InterruptedException {
-        if (pipedInputStream == null) {
-            wait();
-        }
-        return pipedInputStream;
     }
     
     public MessageReceiver(PrologConnection _connection, ServerSocket _serverSocket) throws IOException {
@@ -56,14 +41,10 @@ public class MessageReceiver extends Thread {
             
             InputStream inputStream = socketAux.getInputStream();
             
-            PipedOutputStream pos = new PipedOutputStream();
-            setPipedInputStream(new PipedInputStream(pos));
-            
             int chr;
             String str = "";
             String currentTestName = "";
             while ((chr = inputStream.read()) != -1) {
-                pos.write(chr);
                 str += (char) chr;
                 if (chr == '\n') {
                     final String lineToWrite = str;

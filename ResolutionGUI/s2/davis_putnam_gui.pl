@@ -41,8 +41,8 @@ process_command(InStream, OutStream, _) :-
 solve_file_gui(File, Strategy) :-
     output_stream(OutStream),
     !,
-    read_file_to_clauses(File, Clauses),
-    ( dp(Clauses, Strategy, Assignment) ->
+    parse_text_file_to_clauses(File, Clauses),
+    ( execute_davis_putnam(Clauses, Strategy, Assignment) ->
         format(OutStream, 'Result: YES (SATISFIABLE)~n', []),
         format(OutStream, 'Assignment: {', []),
         print_assignment_to_stream(OutStream, Assignment),

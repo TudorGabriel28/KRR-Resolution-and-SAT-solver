@@ -1,112 +1,112 @@
 :- use_module(library(lists)).
 
-solve_file(File, Strategy) :-
-    read_file_to_clauses(File, Clauses),
-    ( dp(Clauses, Strategy, Assignment) ->
-        format_solution(Assignment)
+solve_sat_from_file(FilePath, SelectionMethod) :-
+    parse_text_file_to_clauses(FilePath, CurrentClauses),
+    ( execute_davis_putnam(CurrentClauses, SelectionMethod, TruthValues) ->
+        display_sat_result(TruthValues)
     ; write('NO.'), nl
     ).
 
-dp([], _, []).
+execute_davis_putnam([], _, []).
 
-dp(Clauses, _, _) :-
-    member([], Clauses), !, fail.
+execute_davis_putnam(CurrentClauses, _, _) :-
+    member([], CurrentClauses), !, fail.
 
-dp(Clauses, Strategy, [true(Atom)|Assignment]) :-
-    select_atom(Strategy, Clauses, Atom),
-    simplify(Clauses, Atom, SimplifiedClauses),
-    dp(SimplifiedClauses, Strategy, Assignment).
+execute_davis_putnam(CurrentClauses, SelectionMethod, [true(VariableAtom)|TruthValues]) :-
+    pick_next_variable(SelectionMethod, CurrentClauses, VariableAtom),
+    simplify_clause_set(CurrentClauses, VariableAtom, SimplifiedClauses),
+    execute_davis_putnam(SimplifiedClauses, SelectionMethod, TruthValues).
 
-dp(Clauses, Strategy, [false(Atom)|Assignment]) :-
-    select_atom(Strategy, Clauses, Atom),
-    get_complement(Atom, NotAtom),
-    simplify(Clauses, NotAtom, SimplifiedClauses),
-    dp(SimplifiedClauses, Strategy, Assignment).
+execute_davis_putnam(CurrentClauses, SelectionMethod, [false(VariableAtom)|TruthValues]) :-
+    pick_next_variable(SelectionMethod, CurrentClauses, VariableAtom),
+    find_opposite_literal(VariableAtom, NotAtom),
+    simplify_clause_set(CurrentClauses, NotAtom, SimplifiedClauses),
+    execute_davis_putnam(SimplifiedClauses, SelectionMethod, TruthValues).
 
-simplify([], _, []).
+simplify_clause_set([], _, []).
 
-simplify([Clause|Rest], Lit, NewClauses) :-
-    member(Lit, Clause), !,
-    simplify(Rest, Lit, NewClauses).
+simplify_clause_set([Clause|Rest], Literal, NewClauses) :-
+    member(Literal, Clause), !,
+    simplify_clause_set(Rest, Literal, NewClauses).
 
-simplify([Clause|Rest], Lit, [NewClause|NewClauses]) :-
-    get_complement(Lit, Comp),
-    delete(Clause, Comp, NewClause), !,
-    simplify(Rest, Lit, NewClauses).
+simplify_clause_set([Clause|Rest], Literal, [NewClause|NewClauses]) :-
+    find_opposite_literal(Literal, Complement),
+    delete(Clause, Complement, NewClause), !,
+    simplify_clause_set(Rest, Literal, NewClauses).
 
-simplify([Clause|Rest], Lit, [Clause|NewClauses]) :-
-    simplify(Rest, Lit, NewClauses).
+simplify_clause_set([Clause|Rest], Literal, [Clause|NewClauses]) :-
+    simplify_clause_set(Rest, Literal, NewClauses).
 
-select_atom(most_frequent, Clauses, BestAtom) :-
-    findall(A, (member(C, Clauses), member(L, C), get_atom(L, A)), AllAtoms),
+pick_next_variable(most_frequent, CurrentClauses, BestAtom) :-
+    findall(A, (member(C, CurrentClauses), member(L, C), extract_atom_from_literal(L, A)), AllAtoms),
     sort(AllAtoms, UniqueAtoms),
-    map_counts(UniqueAtoms, AllAtoms, Counts),
+    associate_counts_with_atoms(UniqueAtoms, AllAtoms, Counts),
     sort(Counts, SortedCounts),
     last(SortedCounts, _-BestAtom).
 
-select_atom(shortest_clause, Clauses, Atom) :-
-    find_shortest_clause(Clauses, ShortestClause),
+pick_next_variable(shortest_clause, CurrentClauses, Atom) :-
+    locate_smallest_clause(CurrentClauses, ShortestClause),
     member(Lit, ShortestClause),
-    get_atom(Lit, Atom), !.
+    extract_atom_from_literal(Lit, Atom), !.
 
-map_counts([], _, []).
-map_counts([A|Rest], All, [Count-A|Counts]) :-
-    count_occurrences(A, All, Count),
-    map_counts(Rest, All, Counts).
+associate_counts_with_atoms([], _, []).
+associate_counts_with_atoms([A|Rest], All, [Count-A|Counts]) :-
+    count_times_atom_appears(A, All, Count),
+    associate_counts_with_atoms(Rest, All, Counts).
 
-count_occurrences(_, [], 0).
-count_occurrences(X, [X|T], N) :-
-    count_occurrences(X, T, N1),
+count_times_atom_appears(_, [], 0).
+count_times_atom_appears(X, [X|T], N) :-
+    count_times_atom_appears(X, T, N1),
     N is N1 + 1.
-count_occurrences(X, [Y|T], N) :-
+count_times_atom_appears(X, [Y|T], N) :-
     X \= Y,
-    count_occurrences(X, T, N).
+    count_times_atom_appears(X, T, N).
 
-find_shortest_clause(Clauses, Shortest) :-
-    predsort(compare_length, Clauses, [Shortest|_]).
+locate_smallest_clause(CurrentClauses, Shortest) :-
+    predsort(compare_clause_lengths, CurrentClauses, [Shortest|_]).
 
-compare_length(R, L1, L2) :-
+compare_clause_lengths(R, L1, L2) :-
     length(L1, Len1),
     length(L2, Len2),
     compare(R, Len1, Len2).
 
-get_atom(not(P), P).
-get_atom(P, P) :- \+ P = not(_).
+extract_atom_from_literal(not(P), P).
+extract_atom_from_literal(P, P) :- \+ P = not(_).
 
-get_complement(not(P), P).
-get_complement(P, not(P)) :- \+ P = not(_).
+find_opposite_literal(not(P), P).
+find_opposite_literal(P, not(P)) :- \+ P = not(_).
 
-read_file_to_clauses(File, Clauses) :-
-    open(File, read, Stream),
-    read_lines(Stream, Lines),
+parse_text_file_to_clauses(FilePath, CurrentClauses) :-
+    open(FilePath, read, Stream),
+    read_all_lines(Stream, Lines),
     close(Stream),
-    parse_lines(Lines, Clauses).
+    convert_lines_to_clauses(Lines, CurrentClauses).
 
-read_lines(Stream, []) :-
+read_all_lines(Stream, []) :-
     at_end_of_stream(Stream), !.
-read_lines(Stream, Lines) :-
+read_all_lines(Stream, Lines) :-
     \+ at_end_of_stream(Stream),
     read_line_to_string(Stream, Line),
     ( Line == end_of_file ->
         Lines = []
     ; Line = "" ->
-        read_lines(Stream, Lines)
+        read_all_lines(Stream, Lines)
     ;
         Lines = [Line|Rest],
-        read_lines(Stream, Rest)
+        read_all_lines(Stream, Rest)
     ).
 
-parse_lines([], []).
-parse_lines([Line|Rest], [Clause|Clauses]) :-
+convert_lines_to_clauses([], []).
+convert_lines_to_clauses([Line|Rest], [Clause|Clauses]) :-
     split_string(Line, " ", "\s\t\n", Words),
     Words \= [],
-    parse_words(Words, Clause),
-    parse_lines(Rest, Clauses).
-parse_lines([_|Rest], Clauses) :-
-    parse_lines(Rest, Clauses).
+    convert_words_to_literals(Words, Clause),
+    convert_lines_to_clauses(Rest, Clauses).
+convert_lines_to_clauses([_|Rest], Clauses) :-
+    convert_lines_to_clauses(Rest, Clauses).
 
-parse_words([], []).
-parse_words([Word|Rest], [Lit|Lits]) :-
+convert_words_to_literals([], []).
+convert_words_to_literals([Word|Rest], [Lit|Lits]) :-
     ( string_concat("-", AtomName, Word) ->
         atom_string(Atom, AtomName),
         Lit = not(Atom)
@@ -114,22 +114,22 @@ parse_words([Word|Rest], [Lit|Lits]) :-
         atom_string(Atom, Word),
         Lit = Atom
     ),
-    parse_words(Rest, Lits).
+    convert_words_to_literals(Rest, Lits).
 
-format_solution(Assignment) :-
+display_sat_result(TruthValues) :-
     write('YES.'), nl,
     write('{'),
-    print_assignment(Assignment),
+    show_variable_values(TruthValues),
     write('}'), nl.
 
-print_assignment([]).
-print_assignment([true(Atom)]) :-
+show_variable_values([]).
+show_variable_values([true(Atom)]) :-
     format('~w/true', [Atom]).
-print_assignment([false(Atom)]) :-
+show_variable_values([false(Atom)]) :-
     format('~w/false', [Atom]).
-print_assignment([true(Atom)|Rest]) :-
+show_variable_values([true(Atom)|Rest]) :-
     format('~w/true; ', [Atom]),
-    print_assignment(Rest).
-print_assignment([false(Atom)|Rest]) :-
+    show_variable_values(Rest).
+show_variable_values([false(Atom)|Rest]) :-
     format('~w/false; ', [Atom]),
-    print_assignment(Rest).
+    show_variable_values(Rest).

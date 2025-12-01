@@ -56,16 +56,16 @@ send_to_gui(Message) :-
     format('~w~n', [Message]).
 
 prove_fol_from_file(File) :-
-    read_clauses_from_file(File, Clauses),
-    ( prove_fol(Clauses) ->
+    load_logic_clauses(File, Clauses),
+    ( check_fol_consistency(Clauses) ->
         send_to_gui('Result: UNSATISFIABLE - Contradiction found!')
     ;
         send_to_gui('Result: SATISFIABLE - No contradiction')
     ).
 
 prove_prop_from_file(File) :-
-    read_clauses_from_file(File, Clauses),
-    ( prove_prop(Clauses) ->
+    load_logic_clauses(File, Clauses),
+    ( check_propositional_consistency(Clauses) ->
         send_to_gui('Result: UNSATISFIABLE - Contradiction found!')
     ;
         send_to_gui('Result: SATISFIABLE - No contradiction')

@@ -43,6 +43,7 @@ public class MainWindow extends JFrame {
     private JLabel s2ResultsLabel;
     private JLabel s2LastResultLabel;
     private JLabel s2OutputLabel;
+    private long s2StartTime;
     
     public MainWindow(String title) {
         super(title);
@@ -285,11 +286,13 @@ public class MainWindow extends JFrame {
         s2LastResultLabel.setText("Running: " + testName + " with " + strategy + "...");
         s2LastResultLabel.setBackground(java.awt.Color.LIGHT_GRAY);
         
-        s2OutputTextArea.append("\n========================================\n");
         s2OutputTextArea.append("Running: " + testName + " with strategy: " + strategy + "\n");
         s2OutputTextArea.append("========================================\n");
         
+        s2StartTime = System.currentTimeMillis();
+
         try {
+            // Send command in format: solve(test1, most_frequent)
             // Send command in format: solve(test1, most_frequent)
             String command = "solve(" + testName + ", " + strategy + ")";
             connection.sender.sendMessageToProlog(command);
@@ -322,7 +325,8 @@ public class MainWindow extends JFrame {
     }
     
     public void updateS2ResultLabel(String testName, String result) {
-        String displayText = testName + " → " + result;
+        long duration = System.currentTimeMillis() - s2StartTime;
+        String displayText = testName + " → " + result + " (" + duration + " ms)";
         s2LastResultLabel.setText(displayText);
         
         // Color code based on result

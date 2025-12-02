@@ -30,7 +30,7 @@ public class PrologConnection {
             prologFile = "test_cases.pl";
             workingDir = "s1";
         } else if (subject.equals("s2")) {
-            prologFile = "davis_putnam_gui.pl";
+            prologFile = "sat_solver_gui.pl";
             workingDir = "s2";
         } else {
             throw new IllegalArgumentException("Invalid subject: " + subject);

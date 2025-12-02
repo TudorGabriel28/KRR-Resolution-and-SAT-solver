@@ -14,7 +14,7 @@ public class ResolutionGUI {
     public static void main(String[] args) throws Exception {
         PrologConnection prologConn;
         
-        Object[] options = {"Subject 1: Resolution", "Subject 2: Davis-Putnam SAT"};
+        Object[] options = {"Subject 1: Resolution", "Subject 2: SAT Solver"};
         int choice = JOptionPane.showOptionDialog(null,
             "Select which subject to run:",
             "KRR Test Cases",
@@ -27,7 +27,7 @@ public class ResolutionGUI {
         String subject = (choice == 0) ? "s1" : "s2";
         
         final MainWindow mainWindow = new MainWindow("KRR Test Cases - " + 
-            (subject.equals("s1") ? "Resolution" : "Davis-Putnam SAT"), subject);
+            (subject.equals("s1") ? "Resolution" : "SAT Solver"), subject);
         
         prologConn = new PrologConnection(PORT, mainWindow, subject);
         mainWindow.setConnection(prologConn);
@@ -39,7 +39,7 @@ public class ResolutionGUI {
                     mainWindow.connection.stopProlog();                        
                     mainWindow.connection.sender.finished = true;
                 } catch (InterruptedException ex) {
-                    // Ignored
+                    System.out.println(ex.getMessage());
                 }
             }
         });

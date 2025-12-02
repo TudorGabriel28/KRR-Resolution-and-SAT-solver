@@ -2,26 +2,26 @@
 
 solve_sat_from_file(FilePath, SelectionMethod) :-
     parse_text_file_to_clauses(FilePath, CurrentClauses),
-    ( execute_davis_putnam(CurrentClauses, SelectionMethod, TruthValues) ->
+    ( execute_sat_solver(CurrentClauses, SelectionMethod, TruthValues) ->
         display_sat_result(TruthValues)
     ; write('NO.'), nl
     ).
 
-execute_davis_putnam([], _, []).
+execute_sat_solver([], _, []).
 
-execute_davis_putnam(CurrentClauses, _, _) :-
+execute_sat_solver(CurrentClauses, _, _) :-
     member([], CurrentClauses), !, fail.
 
-execute_davis_putnam(CurrentClauses, SelectionMethod, [true(VariableAtom)|TruthValues]) :-
+execute_sat_solver(CurrentClauses, SelectionMethod, [true(VariableAtom)|TruthValues]) :-
     pick_next_variable(SelectionMethod, CurrentClauses, VariableAtom),
     simplify_clause_set(CurrentClauses, VariableAtom, SimplifiedClauses),
-    execute_davis_putnam(SimplifiedClauses, SelectionMethod, TruthValues).
+    execute_sat_solver(SimplifiedClauses, SelectionMethod, TruthValues).
 
-execute_davis_putnam(CurrentClauses, SelectionMethod, [false(VariableAtom)|TruthValues]) :-
+execute_sat_solver(CurrentClauses, SelectionMethod, [false(VariableAtom)|TruthValues]) :-
     pick_next_variable(SelectionMethod, CurrentClauses, VariableAtom),
     find_opposite_literal(VariableAtom, NotAtom),
     simplify_clause_set(CurrentClauses, NotAtom, SimplifiedClauses),
-    execute_davis_putnam(SimplifiedClauses, SelectionMethod, TruthValues).
+    execute_sat_solver(SimplifiedClauses, SelectionMethod, TruthValues).
 
 simplify_clause_set([], _, []).
 
